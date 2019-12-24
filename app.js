@@ -5,6 +5,7 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const passportLocalMongoose = require("passport-local-mongoose");
 const expressSession = require("express-session");
+const qrcode = require("qrcode");
 
 const User = require("./models/user");
 
@@ -32,7 +33,10 @@ app.get("/", function(req, res) {
 });
 
 app.get("/secret", isLoggedIn, function(req, res) {
-    res.render("secret", {user : req.user});
+    qrcode.toDataURL(req.user.id, function(err, url) {
+        let user = {user_ : req.user, qr : url};
+        res.render("secret", {user : user});  
+    });
 });
 
 // Auth Routes
@@ -96,5 +100,5 @@ function isLoggedIn(req, res, next) {
 }
 
 app.listen(3000, function() {
-    console.log("listening to port 8000");
+    console.log("listening to port 3000");
 });
