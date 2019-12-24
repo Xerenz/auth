@@ -5,8 +5,14 @@ const Schema = mongoose.Schema;
 
 let UserSchema = new Schema(
     {
-        username: {type: String, required: true, max: 100},
-        password: {type: String, required: false}
+    	// for auth
+        username: {type: String, max: 100},
+        password: {type: String},
+
+        // personal info
+        name : {type: String},
+        phone : {type: String},
+        college : {type: String},
     }
 );
 

@@ -12,14 +12,14 @@ mongoose.connect("mongodb://127.0.0.1/auth_test");
 
 const app = express();
 
-app.use(bodyParser.urlencoded());
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(expressSession({
     secret: "We are working on user authenticaton",
     resave: false,
     saveUninitialized: false
 }));
+app.use(bodyParser.urlencoded({extended : false}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
@@ -32,7 +32,7 @@ app.get("/", function(req, res) {
 });
 
 app.get("/secret", isLoggedIn, function(req, res) {
-    res.render("secret");
+    res.render("secret", {user : req.user});
 });
 
 // Auth Routes
@@ -45,13 +45,22 @@ app.get("/register", function(req, res) {
 
 app.post("/register", function(req, res) {
     User.register(new User({
-        username : req.body.username
+        // auth info
+        username : req.body.username,
+
+        // personal info
+        name : req.body.name,
+        phone : req.body.phone,
+        college : req.body.college
+
     }), req.body.password, function(err, user) {
         if (err) {
             console.log(err);
             return res.render("register");
         }
+        console.log("user created " + user.username);
         passport.authenticate("local")(req, res, function() {
+            console.log("user authenticated");
             res.redirect("/secret");
         });
     });
@@ -60,7 +69,10 @@ app.post("/register", function(req, res) {
 
 // Login
 app.get("/login", function(req, res) {
-    res.render("login");
+    var message = "LogIn Here!"
+    if (req.isAuthenticated)
+        message = "LogIn with another account?";
+    res.render("login", {message : message});
 });
 
 app.post("/login", passport.authenticate("local", {
@@ -83,6 +95,6 @@ function isLoggedIn(req, res, next) {
     res.redirect("/login");
 }
 
-app.listen(8000, function() {
+app.listen(3000, function() {
     console.log("listening to port 8000");
 });
