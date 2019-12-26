@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const request = require("request");
 const passport = require("passport");
 const localStrategy = require("passport-local");
 const passportLocalMongoose = require("passport-local-mongoose");
@@ -8,6 +9,8 @@ const expressSession = require("express-session");
 const qrcode = require("qrcode");
 
 const User = require("./models/user");
+const Event = require("./models/events");
+const Transaction = require("./models/transaction");
 
 mongoose.connect("mongodb://127.0.0.1/auth_test");
 
@@ -74,7 +77,7 @@ app.post("/register", function(req, res) {
 // Login
 app.get("/login", function(req, res) {
     var message = "LogIn Here!"
-    if (req.isAuthenticated)
+    if (req.user)
         message = "LogIn with another account?";
     res.render("login", {message : message});
 });
@@ -98,6 +101,30 @@ function isLoggedIn(req, res, next) {
     }
     res.redirect("/login");
 }
+
+// =============================== events ================================== //
+
+app.get("/events", function(req, res) {
+    if (req.user) 
+        res.render("events");
+    else 
+        return res.redirect("/login");
+});
+
+
+// =============================== payments ================================ //
+
+app.get("/payment", function(req, res) {
+    // console.log(req.body);
+    console.log(req.query);
+});
+
+app.post("/payments", function(req, res) {
+    console.log("post request")
+    console.log(req.body);
+});
+
+// ========================================================================== //
 
 app.listen(3000, function() {
     console.log("listening to port 3000");

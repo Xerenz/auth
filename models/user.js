@@ -13,6 +13,10 @@ let UserSchema = new Schema(
         name : {type: String},
         phone : {type: String},
         college : {type: String},
+
+        // registration details
+        events : [{type : Schema.Types.ObjectId, ref: "Event"}],
+        accomodation : {type : Schema.Types.ObjectId, ref: "Accomodation"}
     }
 );
 
